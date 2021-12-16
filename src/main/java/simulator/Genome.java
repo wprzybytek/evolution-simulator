@@ -8,12 +8,17 @@ public class Genome {
     public Genome(ArrayList<Gene> left, ArrayList<Gene> right) {
         genes.addAll(left);
         genes.addAll(right);
-        //genes.sort();
+        genes.sort(Gene::compareTo);
     }
 
     public Genome() {
         for(int i = 0; i < 32; i++) {
             genes.add(new Gene(RNG.rng(0, 7)));
         }
+        genes.sort(Gene::compareTo);
+    }
+
+    public ArrayList<Gene> getGenes() {
+        return genes;
     }
 }

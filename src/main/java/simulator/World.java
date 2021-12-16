@@ -3,6 +3,7 @@ package simulator;
 
 public class World {
     public static void main(String[] args) {
-        System.out.println(RNG.rng(1, 2));
+        Genome genome = new Genome();
+        genome.getGenes().forEach(gene -> System.out.print(gene.number + " "));
     }
 }

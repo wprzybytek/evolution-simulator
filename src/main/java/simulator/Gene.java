@@ -9,9 +9,8 @@ public class Gene implements Comparable<Gene>{
 
     @Override
     public int compareTo(Gene o) {
-        if(this.number >= o.number) {
-            return 1;
-        }
-        return -1;
+        if(this.number > o.number) return 1;
+        else if(this.number < o.number) return -1;
+        return 0;
     }
 }
