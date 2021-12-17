@@ -1,23 +1,26 @@
 package simulator;
 
-public class Animal {
+public class Animal implements Comparable<Animal>{
 
     private int energy;
     private Vector2D position;
     private Direction direction;
     private final Genome genome;
+    private AbstractWorldMap map;
 
-    public Animal(int startEnergy, Vector2D position) {
+    public Animal(int startEnergy, Vector2D position, AbstractWorldMap map) {
         this.energy = startEnergy;
         this.position = position;
         this.direction = Direction.values()[RNG.rng(0, 7)];
+        this.map = map;
         this.genome = new Genome();
     }
 
-    public Animal(int startEnergy, Vector2D position, Genome genome) {
+    public Animal(int startEnergy, Vector2D position, AbstractWorldMap map, Genome genome) {
         this.energy = startEnergy;
         this.position = position;
         this.direction = Direction.values()[RNG.rng(0, 7)];
+        this.map = map;
         this.genome = genome;
     }
 
@@ -48,6 +51,20 @@ public class Animal {
         else {
             this.direction = Direction.getDirection((this.direction.angle + moveDirection.angle) % 360);
         }
-        this.energy -= 1;
+        this.energy -= map.moveEnergy;
+    }
+
+    public void eat(Grass grass, int splitWith) {
+        this.energy += Math.floorDiv(map.plantEnergy, splitWith);
+        if(splitWith == 1) map.grassEaten(grass);
+    }
+
+    public void removeEnergy() {
+        this.energy -= (int) Math.ceil(map.startEnergy/4);
+    }
+
+    @Override
+    public int compareTo(Animal o) {
+        return Integer.compare(this.getEnergy(), o.getEnergy());
     }
 }
