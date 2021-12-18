@@ -43,10 +43,16 @@ public class Animal implements Comparable<Animal>{
     public void move() {
         Direction moveDirection = Direction.values()[genome.getGenes().get(RNG.rng(0, 31)).number];
         if(moveDirection == Direction.NORTH) {
-            this.position = this.position.next(this.direction);
+            Vector2D newPosition = this.position.next(this.direction);
+            if(map.canMoveTo(newPosition)) {
+                this.position = newPosition;
+            }
         }
         else if(moveDirection == Direction.SOUTH) {
-            this.position = this.position.previous(this.direction);
+            Vector2D newPosition = this.position.previous(this.direction);
+            if(map.canMoveTo(newPosition)) {
+                this.position = newPosition;
+            }
         }
         else {
             this.direction = Direction.getDirection((this.direction.angle + moveDirection.angle) % 360);
@@ -54,9 +60,8 @@ public class Animal implements Comparable<Animal>{
         this.energy -= map.moveEnergy;
     }
 
-    public void eat(Grass grass, int splitWith) {
+    public void eat(int splitWith) {
         this.energy += Math.floorDiv(map.plantEnergy, splitWith);
-        if(splitWith == 1) map.grassEaten(grass);
     }
 
     public void removeEnergy() {
@@ -65,6 +70,8 @@ public class Animal implements Comparable<Animal>{
 
     @Override
     public int compareTo(Animal o) {
-        return Integer.compare(this.getEnergy(), o.getEnergy());
+        if(this.getEnergy() > o.getEnergy()) return -1;
+        else if(this.getEnergy() < o.getEnergy()) return 1;
+        return 0;
     }
 }

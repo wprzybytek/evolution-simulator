@@ -1,11 +1,12 @@
 package simulator;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Genome {
-    private final ArrayList<Gene> genes = new ArrayList<>();
+    private final List<Gene> genes = new ArrayList<>();
 
-    public Genome(ArrayList<Gene> left, ArrayList<Gene> right) {
+    public Genome(List<Gene> left, List<Gene> right) {
         genes.addAll(left);
         genes.addAll(right);
         genes.sort(Gene::compareTo);
@@ -18,7 +19,7 @@ public class Genome {
         genes.sort(Gene::compareTo);
     }
 
-    public ArrayList<Gene> getGenes() {
+    public List<Gene> getGenes() {
         return genes;
     }
 }
