@@ -1,4 +1,9 @@
-package simulator;
+package simulator.animal;
+
+import simulator.helper.RNG;
+import simulator.map.AbstractWorldMap;
+import simulator.map_elements.Direction;
+import simulator.map_elements.Vector2D;
 
 public class Animal implements Comparable<Animal>{
 
@@ -8,6 +13,7 @@ public class Animal implements Comparable<Animal>{
     private final Genome genome;
     private AbstractWorldMap map;
 
+    //constructors
     public Animal(int startEnergy, Vector2D position, AbstractWorldMap map) {
         this.energy = startEnergy;
         this.position = position;
@@ -24,6 +30,7 @@ public class Animal implements Comparable<Animal>{
         this.genome = genome;
     }
 
+    //getters
     public int getEnergy() {
         return energy;
     }
@@ -40,6 +47,16 @@ public class Animal implements Comparable<Animal>{
         return genome;
     }
 
+    //setters
+    public void eat(int splitWith) {
+        this.energy += Math.floorDiv(map.plantEnergy, splitWith);
+    }
+
+    public void removeEnergy() {
+        this.energy -= (int) Math.ceil(map.startEnergy/4);
+    }
+
+    //methods
     public void move() {
         Direction moveDirection = Direction.values()[genome.getGenes().get(RNG.rng(0, 31)).number];
         if(moveDirection == Direction.NORTH) {
@@ -58,14 +75,6 @@ public class Animal implements Comparable<Animal>{
             this.direction = Direction.getDirection((this.direction.angle + moveDirection.angle) % 360);
         }
         this.energy -= map.moveEnergy;
-    }
-
-    public void eat(int splitWith) {
-        this.energy += Math.floorDiv(map.plantEnergy, splitWith);
-    }
-
-    public void removeEnergy() {
-        this.energy -= (int) Math.ceil(map.startEnergy/4);
     }
 
     @Override

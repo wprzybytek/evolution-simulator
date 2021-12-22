@@ -1,4 +1,6 @@
-package simulator;
+package simulator.animal;
+
+import simulator.helper.RNG;
 
 import java.util.ArrayList;
 import java.util.List;

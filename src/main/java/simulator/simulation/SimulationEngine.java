@@ -1,4 +1,13 @@
-package simulator;
+package simulator.simulation;
+
+import simulator.helper.RNG;
+import simulator.animal.Animal;
+import simulator.animal.Copulation;
+import simulator.map.AbstractWorldMap;
+import simulator.map.FlatMap;
+import simulator.map.RoundMap;
+import simulator.map_elements.Grass;
+import simulator.map_elements.Vector2D;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,11 +17,12 @@ public class SimulationEngine implements Runnable{
     public final int startEnergy;
     public final int moveEnergy;
     public final int plantEnergy;
-    private int numberOfAnimals;
+    private int day;
+    private int animalsNumber;
     private List<ITurnEndObserver> observerList = new ArrayList<>();
-
     private AbstractWorldMap map;
 
+    //constructor
     public SimulationEngine(int width, int height, int startEnergy, int moveEnergy, int plantEnergy,
                             float jungleRation, int numberOfAnimals, boolean isFlat, boolean magicEvolution) {
 
@@ -38,9 +48,54 @@ public class SimulationEngine implements Runnable{
         }
     }
 
+    //getters
+    public AbstractWorldMap getMap() {
+        return this.map;
+    }
+
+    public int getDay() {
+        return day;
+    }
+
+    public int getGrassNumber() {
+        return this.map.grassMap.size();
+    }
+
+    public int getAnimalsNumber() {
+        int size = 0;
+        for (Map.Entry<Vector2D, ArrayList<Animal>> animalsList : map.animals.entrySet()) {
+            size += animalsList.getValue().size();
+            if(animalsList.getValue().size() == 0) {
+                System.out.println("cos sie zjebalo");
+            }
+        }
+        this.animalsNumber = size;
+        return size;
+    }
+
+    public int getAvgEnergy() {
+        int size = this.animalsNumber;
+        if(size == 0) return 0;
+        int sumOfEnergy = 0;
+        for (Map.Entry<Vector2D, ArrayList<Animal>> animalsList : map.animals.entrySet()) {
+            for (Animal animal : animalsList.getValue()) {
+                sumOfEnergy += animal.getEnergy();
+            }
+        }
+        return (int) sumOfEnergy/size;
+    }
+
+    //setters
+    public void addObserver(ITurnEndObserver observer) {
+        observerList.add(observer);
+    }
+
+    //methods
     @Override
     public void run() {
+        day = 0;
         while (!(map.animals.isEmpty())) {
+            day += 1;
             dieAndMove();
             eat();
             copulate();
@@ -124,13 +179,5 @@ public class SimulationEngine implements Runnable{
     private void generateGrass() {
         this.map.generateGrassJungle();
         this.map.generateGrassSavannah();
-    }
-
-    public void addObserver(ITurnEndObserver observer) {
-        observerList.add(observer);
-    }
-
-    public AbstractWorldMap getMap() {
-        return this.map;
     }
 }

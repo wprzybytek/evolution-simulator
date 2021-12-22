@@ -1,4 +1,4 @@
-package simulator;
+package simulator.map_elements;
 
 public enum Direction {
     NORTH(0),

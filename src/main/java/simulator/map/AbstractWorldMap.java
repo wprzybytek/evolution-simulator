@@ -1,4 +1,9 @@
-package simulator;
+package simulator.map;
+
+import simulator.animal.Animal;
+import simulator.map_elements.Grass;
+import simulator.helper.RNG;
+import simulator.map_elements.Vector2D;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,6 +22,7 @@ public abstract class AbstractWorldMap {
     public Map<Vector2D, ArrayList<Animal>> animals = new HashMap<>();
     public Map<Vector2D, Grass> grassMap = new HashMap<>();
 
+    //constructor
     public AbstractWorldMap(int height, int width, double jungleRatio, int moveEnergy, int plantEnergy, int startEnergy) {
         this.width = width;
         this.height = height;
@@ -30,6 +36,7 @@ public abstract class AbstractWorldMap {
         this.jungleEnd = this.jungleStart.add(new Vector2D(jungleWidth, jungleHeight));
     }
 
+    //getters
     public int getHeight() {
         return height;
     }
@@ -38,6 +45,7 @@ public abstract class AbstractWorldMap {
         return width;
     }
 
+    //setters
     public void addAnimal(Animal animal) {
         if(animals.containsKey(animal.getPosition())) {
             animals.get(animal.getPosition()).add(animal);
@@ -58,12 +66,13 @@ public abstract class AbstractWorldMap {
         }
     }
 
-    public boolean canMoveTo(Vector2D position) {
-        return true;
-    }
-
     public void grassEaten(Grass grass) {
         this.grassMap.remove(grass.getPosition(), grass);
+    }
+
+    //methods
+    public boolean canMoveTo(Vector2D position) {
+        return true;
     }
 
     public void generateGrassJungle() {
@@ -104,27 +113,41 @@ public abstract class AbstractWorldMap {
 
     public void generateGrassSavannah() {
         boolean generated = false;
+        int counter = 0;
+
         while(!generated) {
-            int x;
-            if(RNG.rng(0, 1) == 0) {
-                x = RNG.rng(0, jungleStart.x - 1);
-            }
-            else {
-                x = RNG.rng(jungleEnd.x + 1, width - 1);
-            }
-            int y;
-            if(RNG.rng(0, 1) == 0) {
-                y = RNG.rng(0, jungleStart.y - 1);
-            }
-            else {
-                y = RNG.rng(jungleEnd.y + 1, height - 1);
-            }
-            Vector2D position = new Vector2D(x, y);
-            if(!(grassMap.containsKey(position) || animals.containsKey(position))) {
+            Vector2D position = new Vector2D(RNG.rng(0, width - 1), RNG.rng(0, height - 1));
+            counter += 1;
+            if(!((position.x >= jungleStart.x && position.x <= jungleEnd.x
+                    && position.y >= jungleStart.y && position.y <= jungleEnd.y)
+                    && (grassMap.containsKey(position) || animals.containsKey(position)))) {
                 Grass grass = new Grass(position);
                 grassMap.put(position, grass);
                 generated = true;
+                counter = 0;
             }
+            if(counter >= height * width) {
+                generated = true;
+                generateGrassSavannahIteratively();
+            }
+        }
+    }
+
+    private void generateGrassSavannahIteratively() {
+        boolean generated = false;
+        for(int x = 0; x < width; x++) {
+            for(int y = 0; y < height; y++) {
+                Vector2D position = new Vector2D(x, y);
+                if (!((position.x >= jungleStart.x && position.x <= jungleEnd.x
+                        && position.y >= jungleStart.y && position.y <= jungleEnd.y)
+                        && (grassMap.containsKey(position) || animals.containsKey(position)))) {
+                    Grass grass = new Grass(position);
+                    grassMap.put(position, grass);
+                    generated = true;
+                    break;
+                }
+            }
+            if(generated) break;
         }
     }
 }

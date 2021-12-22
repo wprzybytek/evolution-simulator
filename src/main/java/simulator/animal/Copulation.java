@@ -1,4 +1,6 @@
-package simulator;
+package simulator.animal;
+import simulator.helper.RNG;
+
 import java.util.List;
 
 public class Copulation {
@@ -17,7 +19,6 @@ public class Copulation {
         }
         parent.removeEnergy();
         strongerParent.removeEnergy();
-        System.out.println("New Child!");
         return new Genome(left, right);
     }
 }

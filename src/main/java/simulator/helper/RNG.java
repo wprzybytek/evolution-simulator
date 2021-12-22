@@ -1,4 +1,4 @@
-package simulator;
+package simulator.helper;
 
 public class RNG {
     public static int rng(int min, int max) {

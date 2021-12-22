@@ -1,16 +1,19 @@
-package simulator;
+package simulator.gui;
 
-import com.sun.javafx.collections.MappingChange;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.HPos;
 import javafx.scene.Scene;
+import javafx.scene.chart.LineChart;
 import javafx.scene.control.Label;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.RowConstraints;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import simulator.simulation.ITurnEndObserver;
+import simulator.simulation.SimulationEngine;
+import simulator.animal.Animal;
+import simulator.map_elements.Grass;
+import simulator.map_elements.Vector2D;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -18,14 +21,37 @@ import java.util.Map;
 
 public class App extends Application implements ITurnEndObserver {
 
-    private GridPane grid;
+    private final GridPane grid = new GridPane();
+    private final Text dayCounter = new Text("Day 0");
+    private final Text animalCounter = new Text("Animals: 0");
+    private final Text grassCounter = new Text("Grass: 0");
     private SimulationEngine engine;
+    private Chart animalChart = new Chart("Animals");
+    private Chart grassChart = new Chart("Grass");
+    private Chart avgEnergy = new Chart("Average Energy");
 
-    public void init() {
-        grid = new GridPane();
-        engine = new SimulationEngine(10, 10, 10, 1,
-                5, 0.2f, 10, true, false);
-        engine.addObserver(this);
+    @Override
+    public void start(Stage primaryStage) {
+        StartMenu startMenu = new StartMenu();
+        primaryStage.setScene(startMenu.getMenuScene());
+        primaryStage.show();
+
+        startMenu.getButton().setOnAction(click -> {
+            engine = new SimulationEngine(startMenu.getWidth(), startMenu.getHeight(), startMenu.getStartEnergy(),
+                    startMenu.getMoveEnergy(), startMenu.getPlantEnergy(), startMenu.getJungleRatio(),
+                    startMenu.getNumberOfAnimals(), startMenu.getIsFlat(), startMenu.getMagicEvolution());
+            engine.addObserver(this);
+            prepareGrid();
+            updateValues();
+            VBox values = new VBox(dayCounter, animalChart.getChart(), grassChart.getChart(), avgEnergy.getChart());
+            HBox layout = new HBox(values, grid);
+            Scene scene = new Scene(layout, 600, 600);
+            primaryStage.setScene(scene);
+            primaryStage.setMaximized(true);
+            primaryStage.show();
+            Thread engineThread = new Thread(engine);
+            engineThread.start();
+        });
     }
 
     private void prepareGrid() {
@@ -39,20 +65,20 @@ public class App extends Application implements ITurnEndObserver {
         Label xy = new Label("y/x");
         this.grid.add(xy, 0, 0);
         GridPane.setHalignment(xy, HPos.CENTER);
-        this.grid.getColumnConstraints().add(new ColumnConstraints(20));
-        this.grid.getRowConstraints().add(new RowConstraints(20));
+        this.grid.getColumnConstraints().add(new ColumnConstraints(30));
+        this.grid.getRowConstraints().add(new RowConstraints(30));
 
         for (int i = 0; i < width; i++) {
             Label label = new Label(Integer.toString(i));
             this.grid.add(label, i + 1, 0);
-            this.grid.getColumnConstraints().add(new ColumnConstraints(20));
+            this.grid.getColumnConstraints().add(new ColumnConstraints(30));
             GridPane.setHalignment(label, HPos.CENTER);
         }
 
         for (int i = 0; i < height; i++) {
             Label label = new Label(Integer.toString(height - 1 - i));
             this.grid.add(label, 0, i + 1);
-            this.grid.getRowConstraints().add(new RowConstraints(20));
+            this.grid.getRowConstraints().add(new RowConstraints(30));
             GridPane.setHalignment(label, HPos.CENTER);
         }
 
@@ -85,16 +111,12 @@ public class App extends Application implements ITurnEndObserver {
         }
     }
 
-    @Override
-    public void start(Stage primaryStage) throws Exception {
-        prepareGrid();
-        Scene scene = new Scene(grid, 600, 600);
-        primaryStage.setScene(scene);
-        primaryStage.setMaximized(true);
-        primaryStage.show();
-
-        Thread engineThread = new Thread(engine);
-        engineThread.start();
+    public void updateValues() {
+        int day = engine.getDay();
+        dayCounter.setText("Day " + day);
+        animalChart.updateChart(day, engine.getAnimalsNumber());
+        grassChart.updateChart(day, engine.getGrassNumber());
+        avgEnergy.updateChart(day, engine.getAvgEnergy());
     }
 
     @Override
@@ -102,6 +124,7 @@ public class App extends Application implements ITurnEndObserver {
         Platform.runLater(() -> {
             grid.getChildren().clear();
             prepareGrid();
+            updateValues();
         });
     }
 }

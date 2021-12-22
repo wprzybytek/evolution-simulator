@@ -1,4 +1,4 @@
-package simulator;
+package simulator.animal;
 
 public class Gene implements Comparable<Gene>{
     public final int number;
