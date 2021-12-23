@@ -13,22 +13,24 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class SimulationEngine implements Runnable{
+public abstract class AbstractSimulationEngine implements Runnable{
     public final int startEnergy;
     public final int moveEnergy;
     public final int plantEnergy;
-    private int day;
-    private int animalsNumber;
-    private List<ITurnEndObserver> observerList = new ArrayList<>();
-    private AbstractWorldMap map;
+    protected int day;
+    protected int animalsNumber;
+    protected final int eraTime;
+    protected final List<ITurnEndObserver> observerList = new ArrayList<>();
+    protected final AbstractWorldMap map;
 
     //constructor
-    public SimulationEngine(int width, int height, int startEnergy, int moveEnergy, int plantEnergy,
-                            float jungleRation, int numberOfAnimals, boolean isFlat, boolean magicEvolution) {
+    public AbstractSimulationEngine(int width, int height, int startEnergy, int moveEnergy, int plantEnergy,
+                                    float jungleRation, int numberOfAnimals, int eraTime, boolean isFlat) {
 
         this.startEnergy = startEnergy;
         this.moveEnergy = moveEnergy;
         this.plantEnergy = plantEnergy;
+        this.eraTime = eraTime;
 
         if (isFlat) {
             map = new FlatMap(height, width, jungleRation, moveEnergy, plantEnergy, startEnergy);
@@ -38,7 +40,7 @@ public class SimulationEngine implements Runnable{
 
         int animalCounter = 0;
 
-        while (animalCounter <= numberOfAnimals) {
+        while (animalCounter < numberOfAnimals) {
             Vector2D position = new Vector2D(RNG.rng(0, width - 1), RNG.rng(0, height - 1));
             if (!(map.animals.containsKey(position))) {
                 Animal animal = new Animal(startEnergy, position, this.map);
@@ -46,6 +48,8 @@ public class SimulationEngine implements Runnable{
                 animalCounter++;
             }
         }
+
+        map.addAllFreeTiles();
     }
 
     //getters
@@ -65,9 +69,6 @@ public class SimulationEngine implements Runnable{
         int size = 0;
         for (Map.Entry<Vector2D, ArrayList<Animal>> animalsList : map.animals.entrySet()) {
             size += animalsList.getValue().size();
-            if(animalsList.getValue().size() == 0) {
-                System.out.println("cos sie zjebalo");
-            }
         }
         this.animalsNumber = size;
         return size;
@@ -90,6 +91,10 @@ public class SimulationEngine implements Runnable{
         observerList.add(observer);
     }
 
+    public void addMagicObserver(IMagicObserver observer){
+        ;
+    }
+
     //methods
     @Override
     public void run() {
@@ -103,7 +108,7 @@ public class SimulationEngine implements Runnable{
             observerList.forEach(ITurnEndObserver::turnEnded);
 
             try{
-                Thread.sleep(300);
+                Thread.sleep(eraTime);
             }
             catch (InterruptedException ex) {
                 System.out.println(ex);
@@ -111,7 +116,7 @@ public class SimulationEngine implements Runnable{
         }
     }
 
-    private void dieAndMove() {
+    protected void dieAndMove() {
         ArrayList<Animal> graveyard = new ArrayList<>();
         ArrayList<Animal> animalsToMoveList = new ArrayList<>();
         ArrayList<Vector2D> oldPositionsOfAnimals = new ArrayList<>();
@@ -136,7 +141,7 @@ public class SimulationEngine implements Runnable{
         }
     }
 
-    private void eat() {
+    protected void eat() {
         ArrayList<Grass> graveyard = new ArrayList<>();
         for (Map.Entry<Vector2D, Grass> entry : map.grassMap.entrySet()) {
             Vector2D grassPosition = entry.getKey();
@@ -162,7 +167,7 @@ public class SimulationEngine implements Runnable{
         graveyard.forEach(grass -> {map.grassEaten(grass);});
     }
 
-    private void copulate() {
+    protected void copulate() {
         int minimalEnergy = (int) Math.ceil(startEnergy/2);
         for (Map.Entry<Vector2D, ArrayList<Animal>> animalsList : map.animals.entrySet()) {
             animalsList.getValue().sort(Animal::compareTo);
@@ -176,8 +181,7 @@ public class SimulationEngine implements Runnable{
         }
     }
 
-    private void generateGrass() {
-        this.map.generateGrassJungle();
-        this.map.generateGrassSavannah();
+    protected void generateGrass() {
+        this.map.generateGrass();
     }
 }

@@ -81,6 +81,11 @@ public class Vector2D {
         }
     }
 
+    public boolean isInRectangle(Vector2D lowerLeft, Vector2D upperRight) {
+        return this.x >= lowerLeft.x && this.y >= lowerLeft.y
+                && this.x <= upperRight.x && this.y <= upperRight.y;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

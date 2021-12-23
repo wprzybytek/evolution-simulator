@@ -1,7 +1,11 @@
 package simulator.gui;
 
+import javafx.geometry.HPos;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.GridPane;
@@ -16,10 +20,11 @@ public class StartMenu {
     MenuElementBox plantEnergy;
     MenuElementBox jungleRatio;
     MenuElementBox numberOfAnimals;
-    RadioButton flat;
-    RadioButton round;
-    RadioButton magic;
-    RadioButton normal;
+    MenuElementBox eraTime;
+    RadioButton flatMagic;
+    RadioButton flatNormal;
+    RadioButton roundMagic;
+    RadioButton roundNormal;
 
     private Button startSimulation;
     private Scene menuScene;
@@ -32,18 +37,21 @@ public class StartMenu {
         this.plantEnergy = new MenuElementBox("Plant Energy", "10");
         this.jungleRatio = new MenuElementBox("Jungle Ratio", "0.2f");
         this.numberOfAnimals = new MenuElementBox("Number of animals", "30");
-        ToggleGroup isFlat = new ToggleGroup();
-        this.flat = new RadioButton("Flat Map");
-        this.round = new RadioButton("Round Map");
-        round.setToggleGroup(isFlat);
-        flat.setToggleGroup(isFlat);
-        flat.setSelected(true);
-        ToggleGroup evolution = new ToggleGroup();
-        this.normal = new RadioButton("Normal Evolution");
-        this.magic = new RadioButton("Magic Evolution");
-        this.normal.setToggleGroup(evolution);
-        this.magic.setToggleGroup(evolution);
-        normal.setSelected(true);
+        this.eraTime = new MenuElementBox("Time of an era [ms]: ", "300");
+        Label flatMap = new Label("Evolution type on flat map: ");
+        ToggleGroup flatEvolution = new ToggleGroup();
+        this.flatNormal = new RadioButton("Normal Evolution");
+        this.flatMagic = new RadioButton("Magic Evolution");
+        this.flatNormal.setToggleGroup(flatEvolution);
+        this.flatMagic.setToggleGroup(flatEvolution);
+        flatNormal.setSelected(true);
+        Label roundMap = new Label("Evolution type on round map: ");
+        ToggleGroup roundEvolution = new ToggleGroup();
+        this.roundNormal = new RadioButton("Normal Evolution");
+        this.roundMagic = new RadioButton("Magic Evolution");
+        this.roundNormal.setToggleGroup(roundEvolution);
+        this.roundMagic.setToggleGroup(roundEvolution);
+        roundNormal.setSelected(true);
         VBox heightBox = this.height.getVbox();
         VBox widthBox = this.width.getVbox();
         VBox seBox = this.startEnergy.getVbox();
@@ -51,8 +59,9 @@ public class StartMenu {
         VBox peBox = this.plantEnergy.getVbox();
         VBox jrBox = this.jungleRatio.getVbox();
         VBox noaBox = this.numberOfAnimals.getVbox();
-        HBox ifBox = new HBox(flat, round);
-        HBox magicBox = new HBox(normal, magic);
+        VBox etBox = this.eraTime.getVbox();
+        HBox flatMagicBox = new HBox(flatMap, flatNormal, flatMagic);
+        HBox roundMagicBox = new HBox(roundMap, roundNormal, roundMagic);
         startSimulation = new Button("Start");
         GridPane grid = new GridPane();
         grid.add(heightBox, 0, 0);
@@ -62,9 +71,13 @@ public class StartMenu {
         grid.add(peBox, 0, 4);
         grid.add(jrBox, 0, 5);
         grid.add(noaBox, 0, 6);
-        grid.add(ifBox, 0, 7);
-        grid.add(magicBox, 0, 8);
-        grid.add(startSimulation, 0, 9);
+        grid.add(etBox, 0, 7);
+        grid.add(flatMagicBox, 0, 8);
+        grid.add(roundMagicBox, 0, 9);
+        grid.add(startSimulation, 0, 10);
+        GridPane.setHalignment(startSimulation, HPos.CENTER);
+        grid.setVgap(20);
+        grid.setAlignment(Pos.CENTER);
         menuScene = new Scene(grid, 600, 600);
     }
 
@@ -104,11 +117,15 @@ public class StartMenu {
         return Integer.parseInt(this.numberOfAnimals.text());
     }
 
-    public boolean getIsFlat() {
-        return flat.isSelected();
+    public int getEraTime() {
+        return Integer.parseInt(this.eraTime.text());
     }
 
-    public boolean getMagicEvolution() {
-        return magic.isSelected();
+    public boolean getFlatMagic() {
+        return flatMagic.isSelected();
+    }
+
+    public boolean getRoundMagic() {
+        return roundMagic.isSelected();
     }
 }

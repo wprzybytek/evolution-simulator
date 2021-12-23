@@ -2,6 +2,8 @@ package simulator.animal;
 
 import simulator.helper.RNG;
 import simulator.map.AbstractWorldMap;
+import simulator.map.FlatMap;
+import simulator.map.RoundMap;
 import simulator.map_elements.Direction;
 import simulator.map_elements.Vector2D;
 
@@ -61,15 +63,21 @@ public class Animal implements Comparable<Animal>{
         Direction moveDirection = Direction.values()[genome.getGenes().get(RNG.rng(0, 31)).number];
         if(moveDirection == Direction.NORTH) {
             Vector2D newPosition = this.position.next(this.direction);
-            if(map.canMoveTo(newPosition)) {
-                this.position = newPosition;
+            if(map.getClass() == FlatMap.class){
+                if (map.canMoveTo(newPosition)) {
+                    this.position = newPosition;
+                }
             }
+            else this.position = map.getNewPosition(newPosition);
         }
         else if(moveDirection == Direction.SOUTH) {
             Vector2D newPosition = this.position.previous(this.direction);
-            if(map.canMoveTo(newPosition)) {
-                this.position = newPosition;
+            if(map.getClass() == FlatMap.class){
+                if (map.canMoveTo(newPosition)) {
+                    this.position = newPosition;
+                }
             }
+            else this.position = map.getNewPosition(newPosition);
         }
         else {
             this.direction = Direction.getDirection((this.direction.angle + moveDirection.angle) % 360);

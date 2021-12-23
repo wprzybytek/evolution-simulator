@@ -52,7 +52,7 @@ public class GuiElementBox {
             this.image = new Image(new FileInputStream("src/main/resources/grass.png"));
             this.label = new Label("");
         }
-        this.label.setFont(new Font(10));
+        this.label.setFont(Font.font(10));
         ImageView imageView = new ImageView(image);
         imageView.setFitHeight(20);
         imageView.setFitWidth(20);

@@ -1,5 +1,7 @@
 package simulator.map;
 
+import simulator.map_elements.Vector2D;
+
 public class RoundMap extends AbstractWorldMap{
 
     //constructor
@@ -8,5 +10,8 @@ public class RoundMap extends AbstractWorldMap{
     }
 
     //methods
-
+    @Override
+    public Vector2D getNewPosition(Vector2D position) {
+        return new Vector2D((position.x + this.getWidth()) % this.getWidth(), (position.y + this.getHeight()) % getHeight());
+    }
 }
