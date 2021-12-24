@@ -13,7 +13,9 @@ public class Animal implements Comparable<Animal>{
     private Vector2D position;
     private Direction direction;
     private final Genome genome;
-    private AbstractWorldMap map;
+    private int age = 0;
+    private int numberOfChildren = 0;
+    private final AbstractWorldMap map;
 
     //constructors
     public Animal(int startEnergy, Vector2D position, AbstractWorldMap map) {
@@ -49,6 +51,14 @@ public class Animal implements Comparable<Animal>{
         return genome;
     }
 
+    public int getAge() {
+        return age;
+    }
+
+    public int getNumberOfChildren() {
+        return numberOfChildren;
+    }
+
     //setters
     public void eat(int splitWith) {
         this.energy += Math.floorDiv(map.plantEnergy, splitWith);
@@ -56,6 +66,10 @@ public class Animal implements Comparable<Animal>{
 
     public void removeEnergy() {
         this.energy -= (int) Math.ceil(map.startEnergy/4);
+    }
+
+    public void childBorn() {
+        this.numberOfChildren += 1;
     }
 
     //methods
@@ -83,6 +97,7 @@ public class Animal implements Comparable<Animal>{
             this.direction = Direction.getDirection((this.direction.angle + moveDirection.angle) % 360);
         }
         this.energy -= map.moveEnergy;
+        this.age += 1;
     }
 
     @Override

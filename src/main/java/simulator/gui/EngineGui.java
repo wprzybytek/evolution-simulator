@@ -3,7 +3,7 @@ package simulator.gui;
 import javafx.application.Platform;
 import javafx.geometry.HPos;
 import javafx.geometry.Pos;
-import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
@@ -20,17 +20,21 @@ import java.util.Map;
 public class EngineGui implements ITurnEndObserver, IMagicObserver {
     private final GridPane grid = new GridPane();
     private final Text dayCounter = new Text("Day 0");
-    private AbstractSimulationEngine engine;
-    private Chart animalChart = new Chart("Animals");
-    private Chart grassChart = new Chart("Grass");
-    private Chart avgEnergy = new Chart("Average Energy");
-    private GridPane magicAlert;
+    private final AbstractSimulationEngine engine;
+    private final Chart animalChart = new Chart("Animals");
+    private final Chart grassChart = new Chart("Grass");
+    private final Text dominantGenotype = new Text("");
+    private final Chart avgEnergy = new Chart("Average Energy");
+    private final Chart avgLifetime = new Chart("Average Lifetime");
+    private final Chart avgChildren = new Chart("Average children");
+    private final GridPane magicAlert;
     private int magicCounter = 0;
-    private HBox layout;
-    private Thread engineThread;
+    private Button stopButton = new Button("Stop");
+    private final HBox layout;
+    private final Thread engineThread;
 
     public EngineGui(StartMenu startMenu, boolean isFlat) {
-        if(!startMenu.getRoundMagic()) {
+        if((!startMenu.getFlatMagic() && isFlat) || (!startMenu.getRoundMagic() && !isFlat)) {
             engine = new NormalSimulationEngine(startMenu.getWidth(), startMenu.getHeight(), startMenu.getStartEnergy(),
                     startMenu.getMoveEnergy(), startMenu.getPlantEnergy(), startMenu.getJungleRatio(),
                     startMenu.getNumberOfAnimals(), startMenu.getEraTime(), isFlat);
@@ -44,7 +48,10 @@ public class EngineGui implements ITurnEndObserver, IMagicObserver {
         engine.addObserver(this);
         prepareGrid();
         updateValues();
-        VBox values = new VBox(dayCounter, animalChart.getChart(), grassChart.getChart(), avgEnergy.getChart());
+        VBox dominantGenotypeBox = new VBox(new Label("Dominant genotype: "), dominantGenotype);
+        dominantGenotypeBox.setAlignment(Pos.CENTER);
+        VBox values = new VBox(dayCounter, animalChart.getChart(), grassChart.getChart(), dominantGenotypeBox,
+                avgEnergy.getChart(), avgLifetime.getChart(), avgChildren.getChart());
         values.setAlignment(Pos.CENTER);
         dayCounter.setFont(Font.font(30));
         Label typeOfMap;
@@ -52,7 +59,8 @@ public class EngineGui implements ITurnEndObserver, IMagicObserver {
         else typeOfMap = new Label("Round Map");
         typeOfMap.setFont(Font.font(20));
         magicAlert = new GridPane();
-        VBox gridMap = new VBox(typeOfMap, grid, magicAlert);
+        stopButton.setOnAction(e -> {stopSimulation();});
+        VBox gridMap = new VBox(typeOfMap, grid, stopButton, magicAlert);
         gridMap.setSpacing(10);
         magicAlert.setAlignment(Pos.CENTER);
         layout = new HBox(values, gridMap);
@@ -130,7 +138,22 @@ public class EngineGui implements ITurnEndObserver, IMagicObserver {
         dayCounter.setText("Day " + day);
         animalChart.updateChart(day, engine.getAnimalsNumber());
         grassChart.updateChart(day, engine.getGrassNumber());
+        dominantGenotype.setText(engine.getDominantGenotype());
         avgEnergy.updateChart(day, engine.getAvgEnergy());
+        avgLifetime.updateChart(day, engine.getAvgLifeTime());
+        avgChildren.updateChart(day, engine.getAvgChildren());
+    }
+
+    public void stopSimulation() {
+        stopButton.setText("Start");
+        engine.pause();
+        stopButton.setOnAction(event -> {startSimulation();});
+    }
+
+    public void startSimulation() {
+        stopButton.setText("Stop");
+        engine.resume();
+        stopButton.setOnAction(event -> {stopSimulation();});
     }
 
     @Override

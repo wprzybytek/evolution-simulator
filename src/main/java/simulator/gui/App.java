@@ -1,11 +1,19 @@
 package simulator.gui;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
+import java.beans.EventHandler;
+
 public class App extends Application {
+
+    private EngineGui flatMap;
+    private EngineGui roundMap;
 
     @Override
     public void start(Stage primaryStage) {
@@ -15,8 +23,8 @@ public class App extends Application {
         primaryStage.show();
 
         startMenu.getButton().setOnAction(click -> {
-            EngineGui flatMap = new EngineGui(startMenu, true);
-            EngineGui roundMap = new EngineGui(startMenu, false);
+            this.flatMap = new EngineGui(startMenu, true);
+            this.roundMap = new EngineGui(startMenu, false);
 
             HBox mainLayout = new HBox(flatMap.getLayout(), roundMap.getLayout());
 

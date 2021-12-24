@@ -1,5 +1,6 @@
 package simulator.simulation;
 
+import simulator.animal.Genome;
 import simulator.helper.RNG;
 import simulator.animal.Animal;
 import simulator.animal.Copulation;
@@ -10,6 +11,7 @@ import simulator.map_elements.Grass;
 import simulator.map_elements.Vector2D;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -19,9 +21,15 @@ public abstract class AbstractSimulationEngine implements Runnable{
     public final int plantEnergy;
     protected int day;
     protected int animalsNumber;
+    protected int sumOfLifetimesForDead = 0;
+    protected int deadAnimals = 0;
     protected final int eraTime;
     protected final List<ITurnEndObserver> observerList = new ArrayList<>();
     protected final AbstractWorldMap map;
+
+    private volatile boolean running = true;
+    private volatile boolean paused = false;
+    private final Object pauseLock = new Object();
 
     //constructor
     public AbstractSimulationEngine(int width, int height, int startEnergy, int moveEnergy, int plantEnergy,
@@ -74,6 +82,32 @@ public abstract class AbstractSimulationEngine implements Runnable{
         return size;
     }
 
+    public String getDominantGenotype() {
+        Map<Genome, Integer> genomesMap = new HashMap<>();
+        for (Map.Entry<Vector2D, ArrayList<Animal>> animalsList : map.animals.entrySet()) {
+            for (Animal animal : animalsList.getValue()) {
+                if(genomesMap.containsKey(animal.getGenome())) {
+                    int value = genomesMap.get(animal.getGenome());
+                    genomesMap.remove(animal.getGenome());
+                    genomesMap.put(animal.getGenome(), value + 1);
+                }
+                else genomesMap.put(animal.getGenome(), 1);
+            }
+        }
+
+        Genome dominant = new Genome();
+        int value = -1;
+
+        for(Map.Entry<Genome, Integer> entry : genomesMap.entrySet()) {
+            if(entry.getValue() > value) {
+                dominant = entry.getKey();
+                value = entry.getValue();
+            }
+        }
+
+        return dominant.toString();
+    }
+
     public int getAvgEnergy() {
         int size = this.animalsNumber;
         if(size == 0) return 0;
@@ -84,6 +118,23 @@ public abstract class AbstractSimulationEngine implements Runnable{
             }
         }
         return (int) sumOfEnergy/size;
+    }
+
+    public int getAvgLifeTime() {
+        if(deadAnimals == 0) return 0;
+        return (int) sumOfLifetimesForDead/deadAnimals;
+    }
+
+    public int getAvgChildren() {
+        int size = this.animalsNumber;
+        if(size == 0) return 0;
+        int sumOfChildren = 0;
+        for (Map.Entry<Vector2D, ArrayList<Animal>> animalsList : map.animals.entrySet()) {
+            for (Animal animal : animalsList.getValue()) {
+                sumOfChildren += animal.getNumberOfChildren();
+            }
+        }
+        return (int) sumOfChildren/size;
     }
 
     //setters
@@ -100,19 +151,49 @@ public abstract class AbstractSimulationEngine implements Runnable{
     public void run() {
         day = 0;
         while (!(map.animals.isEmpty())) {
-            day += 1;
-            dieAndMove();
-            eat();
-            copulate();
-            generateGrass();
-            observerList.forEach(ITurnEndObserver::turnEnded);
+            while(running){
+                synchronized (pauseLock) {
+                    if(!running) {
+                        break;
+                    }
+                    if(paused) {
+                        try{
+                            synchronized (pauseLock) {
+                                pauseLock.wait();
+                            }
+                        }
+                        catch(InterruptedException ex) {
+                            break;
+                        }
+                        if(!running) {
+                            break;
+                        }
+                    }
+                }
+                day += 1;
+                dieAndMove();
+                eat();
+                copulate();
+                generateGrass();
+                observerList.forEach(ITurnEndObserver::turnEnded);
 
-            try{
-                Thread.sleep(eraTime);
+                try {
+                    Thread.sleep(eraTime);
+                } catch (InterruptedException ex) {
+                    System.out.println(ex);
+                }
             }
-            catch (InterruptedException ex) {
-                System.out.println(ex);
-            }
+        }
+    }
+
+    public void pause() {
+        paused = true;
+    }
+
+    public void resume() {
+        synchronized (pauseLock) {
+            paused = false;
+            pauseLock.notifyAll();
         }
     }
 
@@ -134,7 +215,11 @@ public abstract class AbstractSimulationEngine implements Runnable{
                 else graveyard.add(animal);
             }
         }
-        graveyard.forEach(animal -> {map.removeAnimal(animal, animal.getPosition());});
+        for (Animal animal : graveyard) {
+            this.sumOfLifetimesForDead += animal.getAge();
+            this.deadAnimals += 1;
+            map.removeAnimal(animal, animal.getPosition());
+        }
         for(int i = 0; i < animalsToMoveList.size(); i++) {
             map.removeAnimal(animalsToMoveList.get(i), oldPositionsOfAnimals.get(i));
             map.addAnimal(animalsToMoveList.get(i));

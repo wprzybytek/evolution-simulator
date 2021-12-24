@@ -7,6 +7,10 @@ public class Gene implements Comparable<Gene>{
         this.number = i;
     }
 
+    public String toString() {
+        return Integer.toString(number);
+    }
+
     @Override
     public int compareTo(Gene o) {
         if(this.number > o.number) return 1;

@@ -18,7 +18,9 @@ public class Copulation {
             right = strongerParent.getGenome().getGenes().subList(32 - dnaFromStronger, 32);
         }
         parent.removeEnergy();
+        parent.childBorn();
         strongerParent.removeEnergy();
+        strongerParent.childBorn();
         return new Genome(left, right);
     }
 }

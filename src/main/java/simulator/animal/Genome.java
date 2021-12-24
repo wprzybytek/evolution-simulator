@@ -24,4 +24,22 @@ public class Genome {
     public List<Gene> getGenes() {
         return genes;
     }
+
+    public String toString() {
+        StringBuilder genome = new StringBuilder();
+        genome.append(genes.get(0).toString());
+        for(int i = 1; i < 32; i++) {
+            genome.append(" ").append(genes.get(i).toString());
+        }
+        return String.valueOf(genome);
+    }
+
+    public boolean equals(Genome genome) {
+        for(int i = 0; i < 32; i++) {
+            if(!(genes.get(i).number == genome.genes.get(i).number)) {
+                return false;
+            }
+        }
+        return true;
+    }
 }
