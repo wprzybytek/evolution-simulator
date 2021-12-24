@@ -27,9 +27,9 @@ public abstract class AbstractSimulationEngine implements Runnable{
     protected final List<ITurnEndObserver> observerList = new ArrayList<>();
     protected final AbstractWorldMap map;
 
-    private volatile boolean running = true;
-    private volatile boolean paused = false;
-    private final Object pauseLock = new Object();
+    protected volatile boolean running = true;
+    protected volatile boolean paused = false;
+    protected final Object pauseLock = new Object();
 
     //constructor
     public AbstractSimulationEngine(int width, int height, int startEnergy, int moveEnergy, int plantEnergy,

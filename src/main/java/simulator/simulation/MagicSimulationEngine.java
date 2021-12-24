@@ -25,23 +25,41 @@ public class MagicSimulationEngine extends AbstractSimulationEngine{
     public void run() {
         day = 0;
         while (!(map.animals.isEmpty())) {
-            day += 1;
-            dieAndMove();
-            if(this.getAnimalsNumber() == 5 && magicAvailable > 0) {
-                this.cloneAnimals();
-                magicAvailable--;
-                magicObserverList.forEach(IMagicObserver::magicHappened);
-            }
-            eat();
-            copulate();
-            generateGrass();
-            observerList.forEach(ITurnEndObserver::turnEnded);
+            while (running) {
+                synchronized (pauseLock) {
+                    if (!running) {
+                        break;
+                    }
+                    if (paused) {
+                        try {
+                            synchronized (pauseLock) {
+                                pauseLock.wait();
+                            }
+                        } catch (InterruptedException ex) {
+                            break;
+                        }
+                        if (!running) {
+                            break;
+                        }
+                    }
+                }
+                day += 1;
+                dieAndMove();
+                if (this.getAnimalsNumber() == 5 && magicAvailable > 0) {
+                    this.cloneAnimals();
+                    magicAvailable--;
+                    magicObserverList.forEach(IMagicObserver::magicHappened);
+                }
+                eat();
+                copulate();
+                generateGrass();
+                observerList.forEach(ITurnEndObserver::turnEnded);
 
-            try{
-                Thread.sleep(eraTime);
-            }
-            catch (InterruptedException ex) {
-                System.out.println(ex);
+                try {
+                    Thread.sleep(eraTime);
+                } catch (InterruptedException ex) {
+                    System.out.println(ex);
+                }
             }
         }
     }
