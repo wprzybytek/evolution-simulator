@@ -6,16 +6,17 @@ import javafx.scene.layout.VBox;
 
 public class MenuElementBox {
 
-    private Label label;
-    private TextField field;
-    private VBox vbox;
+    private final TextField field;
+    private final VBox vbox;
 
+    //constructor
     public MenuElementBox(String desc, String def) {
-        this.label = new Label(desc);
+        Label label = new Label(desc);
         this.field = new TextField(def);
         this.vbox = new VBox(label, field);
     }
 
+    //getters
     public VBox getVbox() {
         return this.vbox;
     }

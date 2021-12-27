@@ -43,9 +43,7 @@ public enum Direction {
             case 315 -> {
                 return NORTH_WEST;
             }
-            default -> {
-                throw new IllegalArgumentException("Not a proper angle: " + angle);
-            }
+            default -> throw new IllegalArgumentException("Not a proper angle: " + angle);
         }
     }
 }

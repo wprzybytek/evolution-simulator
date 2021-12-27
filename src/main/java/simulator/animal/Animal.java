@@ -3,7 +3,6 @@ package simulator.animal;
 import simulator.helper.RNG;
 import simulator.map.AbstractWorldMap;
 import simulator.map.FlatMap;
-import simulator.map.RoundMap;
 import simulator.map_elements.Direction;
 import simulator.map_elements.Vector2D;
 

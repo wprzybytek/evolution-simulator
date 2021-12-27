@@ -1,7 +1,6 @@
 package simulator.gui;
 
 import javafx.geometry.HPos;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -13,31 +12,32 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 public class StartMenu {
-    MenuElementBox width;
-    MenuElementBox height;
-    MenuElementBox startEnergy;
-    MenuElementBox moveEnergy;
-    MenuElementBox plantEnergy;
-    MenuElementBox jungleRatio;
-    MenuElementBox numberOfAnimals;
-    MenuElementBox eraTime;
-    RadioButton flatMagic;
-    RadioButton flatNormal;
-    RadioButton roundMagic;
-    RadioButton roundNormal;
+    final MenuElementBox width;
+    final MenuElementBox height;
+    final MenuElementBox startEnergy;
+    final MenuElementBox moveEnergy;
+    final MenuElementBox plantEnergy;
+    final MenuElementBox jungleRatio;
+    final MenuElementBox numberOfAnimals;
+    final MenuElementBox eraTime;
+    final RadioButton flatMagic;
+    final RadioButton flatNormal;
+    final RadioButton roundMagic;
+    final RadioButton roundNormal;
 
-    private Button startSimulation;
-    private Scene menuScene;
+    private final Button startSimulation;
+    private final Scene menuScene;
 
+    //constructor
     public StartMenu() {
         this.height = new MenuElementBox("Height", "10");
         this.width = new MenuElementBox("Width", "10");
         this.startEnergy = new MenuElementBox("Start Energy", "20");
         this.moveEnergy = new MenuElementBox("Move Energy", "1");
         this.plantEnergy = new MenuElementBox("Plant Energy", "10");
-        this.jungleRatio = new MenuElementBox("Jungle Ratio", "0.2f");
+        this.jungleRatio = new MenuElementBox("Jungle Ratio", "0.2");
         this.numberOfAnimals = new MenuElementBox("Number of animals", "30");
-        this.eraTime = new MenuElementBox("Time of an era [ms]: ", "300");
+        this.eraTime = new MenuElementBox("Time of an era [ms]: ", "1000");
         Label flatMap = new Label("Evolution type on flat map: ");
         ToggleGroup flatEvolution = new ToggleGroup();
         this.flatNormal = new RadioButton("Normal Evolution");
@@ -81,6 +81,7 @@ public class StartMenu {
         menuScene = new Scene(grid, 600, 600);
     }
 
+    //getters
     public Button getButton() {
         return this.startSimulation;
     }
@@ -110,7 +111,7 @@ public class StartMenu {
     }
 
     public float getJungleRatio() {
-        return Float.parseFloat(this.jungleRatio.text());
+        return Float.parseFloat(this.jungleRatio.text() + "f");
     }
 
     public int getNumberOfAnimals() {

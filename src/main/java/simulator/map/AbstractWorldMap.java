@@ -10,17 +10,15 @@ import java.util.*;
 public abstract class AbstractWorldMap {
     private final int height;
     private final int width;
-    private final Vector2D jungleStart;
-    private final Vector2D jungleEnd;
-    private final int jungleWidth;
-    private final int jungleHeight;
+    public final Vector2D jungleStart;
+    public final Vector2D jungleEnd;
     public final int startEnergy;
     public final int moveEnergy;
     public final int plantEnergy;
-    public Map<Vector2D, ArrayList<Animal>> animals = new HashMap<>();
-    public Map<Vector2D, Grass> grassMap = new HashMap<>();
-    public Set<Vector2D> freeJungleTiles = new HashSet<>();
-    public Set<Vector2D> freeSavannahTiles = new HashSet<>();
+    public final Map<Vector2D, ArrayList<Animal>> animals = new HashMap<>();
+    public final Map<Vector2D, Grass> grassMap = new HashMap<>();
+    public final Set<Vector2D> freeJungleTiles = new HashSet<>();
+    public final Set<Vector2D> freeSavannahTiles = new HashSet<>();
 
     //constructor
     public AbstractWorldMap(int height, int width, double jungleRatio, int moveEnergy, int plantEnergy, int startEnergy) {
@@ -30,8 +28,8 @@ public abstract class AbstractWorldMap {
         this.plantEnergy = plantEnergy;
         this.startEnergy = startEnergy;
 
-        this.jungleWidth = (int) Math.floor(this.width * jungleRatio);
-        this.jungleHeight = (int) Math.floor(this.height * jungleRatio);
+        int jungleWidth = (int) Math.floor(this.width * jungleRatio);
+        int jungleHeight = (int) Math.floor(this.height * jungleRatio);
         this.jungleStart = new Vector2D((int) (Math.floor(this.width - jungleWidth) / 2), (int) (Math.floor(this.height - jungleHeight) / 2));
         this.jungleEnd = this.jungleStart.add(new Vector2D(jungleWidth, jungleHeight));
     }

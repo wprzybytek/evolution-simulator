@@ -15,36 +15,22 @@ import java.io.FileNotFoundException;
 public class GuiElementBox {
     private Image image;
     private Label label;
-    private VBox verticalBox;
+    private final VBox verticalBox;
+    private final ImageView imageView;
 
+    //constructor
     public GuiElementBox(Object o) throws FileNotFoundException {
         if(o.getClass() == Animal.class) {
             switch (((Animal) o).getDirection()){
-                case NORTH -> {
-                    this.image = new Image(new FileInputStream("src/main/resources/north.png"));
-                }
-                case NORTH_EAST -> {
-                    this.image = new Image(new FileInputStream("src/main/resources/north-east.png"));
-                }
-                case EAST -> {
-                    this.image = new Image(new FileInputStream("src/main/resources/east.png"));
-                }
-                case SOUTH_EAST -> {
-                    this.image = new Image(new FileInputStream("src/main/resources/south-east.png"));
-                }
-                case SOUTH -> {
-                    this.image = new Image(new FileInputStream("src/main/resources/south.png"));
-                }
-                case SOUTH_WEST -> {
-                    this.image = new Image(new FileInputStream("src/main/resources/south-west.png"));
-                }
-                case WEST -> {
-                    this.image = new Image(new FileInputStream("src/main/resources/west.png"));
-                }
-                case NORTH_WEST -> {
-                    this.image = new Image(new FileInputStream("src/main/resources/north-west.png"));
-                }
-                default -> {throw new FileNotFoundException("No image for direction");}
+                case NORTH -> this.image = new Image(new FileInputStream("src/main/resources/north.png"));
+                case NORTH_EAST -> this.image = new Image(new FileInputStream("src/main/resources/north-east.png"));
+                case EAST -> this.image = new Image(new FileInputStream("src/main/resources/east.png"));
+                case SOUTH_EAST -> this.image = new Image(new FileInputStream("src/main/resources/south-east.png"));
+                case SOUTH -> this.image = new Image(new FileInputStream("src/main/resources/south.png"));
+                case SOUTH_WEST -> this.image = new Image(new FileInputStream("src/main/resources/south-west.png"));
+                case WEST -> this.image = new Image(new FileInputStream("src/main/resources/west.png"));
+                case NORTH_WEST -> this.image = new Image(new FileInputStream("src/main/resources/north-west.png"));
+                default -> throw new FileNotFoundException("No image for direction");
             }
             this.label = new Label(Integer.toString(((Animal) o).getEnergy()));
         }
@@ -52,16 +38,20 @@ public class GuiElementBox {
             this.image = new Image(new FileInputStream("src/main/resources/grass.png"));
             this.label = new Label("");
         }
-        this.label.setFont(Font.font(10));
-        ImageView imageView = new ImageView(image);
-        imageView.setFitHeight(20);
-        imageView.setFitWidth(20);
-
-        this.verticalBox = new VBox(imageView, this.label);
+        this.imageView = new ImageView(image);
+        this.verticalBox = new VBox(this.imageView, this.label);
         this.verticalBox.setAlignment(Pos.CENTER);
     }
 
+    //getters
     public VBox getVerticalBox() {
         return verticalBox;
+    }
+
+    //setters
+    public void setSize(int width, int height) {
+        this.imageView.setFitWidth(150/width);
+        this.imageView.setFitHeight(150/height);
+        this.label.setFont(Font.font(100/width));
     }
 }

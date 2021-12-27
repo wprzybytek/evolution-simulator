@@ -18,7 +18,6 @@ import java.util.Map;
 public abstract class AbstractSimulationEngine implements Runnable{
     public final int startEnergy;
     public final int moveEnergy;
-    public final int plantEnergy;
     protected int day;
     protected int animalsNumber;
     protected int sumOfLifetimesForDead = 0;
@@ -27,7 +26,7 @@ public abstract class AbstractSimulationEngine implements Runnable{
     protected final List<ITurnEndObserver> observerList = new ArrayList<>();
     protected final AbstractWorldMap map;
 
-    protected volatile boolean running = true;
+    protected final boolean running = true;
     protected volatile boolean paused = false;
     protected final Object pauseLock = new Object();
 
@@ -37,7 +36,6 @@ public abstract class AbstractSimulationEngine implements Runnable{
 
         this.startEnergy = startEnergy;
         this.moveEnergy = moveEnergy;
-        this.plantEnergy = plantEnergy;
         this.eraTime = eraTime;
 
         if (isFlat) {
@@ -143,7 +141,6 @@ public abstract class AbstractSimulationEngine implements Runnable{
     }
 
     public void addMagicObserver(IMagicObserver observer){
-        ;
     }
 
     //methods

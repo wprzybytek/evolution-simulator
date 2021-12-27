@@ -8,6 +8,7 @@ import java.util.List;
 public class Genome {
     private final List<Gene> genes = new ArrayList<>();
 
+    //constructors
     public Genome(List<Gene> left, List<Gene> right) {
         genes.addAll(left);
         genes.addAll(right);
@@ -21,6 +22,7 @@ public class Genome {
         genes.sort(Gene::compareTo);
     }
 
+    //getters
     public List<Gene> getGenes() {
         return genes;
     }
@@ -34,12 +36,4 @@ public class Genome {
         return String.valueOf(genome);
     }
 
-    public boolean equals(Genome genome) {
-        for(int i = 0; i < 32; i++) {
-            if(!(genes.get(i).number == genome.genes.get(i).number)) {
-                return false;
-            }
-        }
-        return true;
-    }
 }

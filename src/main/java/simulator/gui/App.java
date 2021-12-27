@@ -1,14 +1,9 @@
 package simulator.gui;
 
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
-
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseEvent;
-import java.beans.EventHandler;
 
 public class App extends Application {
 

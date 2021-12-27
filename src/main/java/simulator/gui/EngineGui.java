@@ -29,10 +29,11 @@ public class EngineGui implements ITurnEndObserver, IMagicObserver {
     private final Chart avgChildren = new Chart("Average children");
     private final GridPane magicAlert;
     private int magicCounter = 0;
-    private Button stopButton = new Button("Stop");
+    private final Button stopButton = new Button("Stop");
     private final HBox layout;
     private final Thread engineThread;
 
+    //constructor
     public EngineGui(StartMenu startMenu, boolean isFlat) {
         if((!startMenu.getFlatMagic() && isFlat) || (!startMenu.getRoundMagic() && !isFlat)) {
             engine = new NormalSimulationEngine(startMenu.getWidth(), startMenu.getHeight(), startMenu.getStartEnergy(),
@@ -68,6 +69,7 @@ public class EngineGui implements ITurnEndObserver, IMagicObserver {
         engineThread = new Thread(engine);
     }
 
+    //getters
     public HBox getLayout() {
         return layout;
     }
@@ -76,32 +78,47 @@ public class EngineGui implements ITurnEndObserver, IMagicObserver {
         return engineThread;
     }
 
+    //methods
     protected void prepareGrid() {
         int width = engine.getMap().getWidth();
         int height = engine.getMap().getHeight();
-        this.grid.setGridLinesVisible(false);
-        this.grid.setGridLinesVisible(true);
+        if(width<=30 && height<=30){
+            this.grid.setGridLinesVisible(false);
+            this.grid.setGridLinesVisible(true);
+        }
         this.grid.getRowConstraints().clear();
         this.grid.getColumnConstraints().clear();
 
         Label xy = new Label("y/x");
+        xy.setFont(Font.font(100/width));
         this.grid.add(xy, 0, 0);
         GridPane.setHalignment(xy, HPos.CENTER);
-        this.grid.getColumnConstraints().add(new ColumnConstraints(30));
-        this.grid.getRowConstraints().add(new RowConstraints(30));
+        this.grid.getColumnConstraints().add(new ColumnConstraints(300/width));
+        this.grid.getRowConstraints().add(new RowConstraints(300/height));
 
         for (int i = 0; i < width; i++) {
             Label label = new Label(Integer.toString(i));
+            label.setFont(Font.font(100/width));
             this.grid.add(label, i + 1, 0);
-            this.grid.getColumnConstraints().add(new ColumnConstraints(30));
+            this.grid.getColumnConstraints().add(new ColumnConstraints(300/width));
             GridPane.setHalignment(label, HPos.CENTER);
         }
 
         for (int i = 0; i < height; i++) {
             Label label = new Label(Integer.toString(height - 1 - i));
+            label.setFont(Font.font(100/height));
             this.grid.add(label, 0, i + 1);
-            this.grid.getRowConstraints().add(new RowConstraints(30));
+            this.grid.getRowConstraints().add(new RowConstraints(300/height));
             GridPane.setHalignment(label, HPos.CENTER);
+        }
+
+        for(int x = engine.getMap().jungleStart.x; x <= engine.getMap().jungleEnd.x; x++) {
+            for(int y = engine.getMap().jungleStart.y; y <= engine.getMap().jungleEnd.y; y++) {
+                Label label = new Label("");
+                label.setStyle("-fx-background-color: #426542");
+                label.setPrefSize(300/width, 300/height);
+                this.grid.add(label, x + 1, height - y);
+            }
         }
 
         Map<Vector2D, ArrayList<Animal>> animals = engine.getMap().animals;
@@ -111,10 +128,14 @@ public class EngineGui implements ITurnEndObserver, IMagicObserver {
             Animal animal = entry.getValue().get(0);
             VBox verticalBox = null;
             try {
-                verticalBox = (new GuiElementBox(animal).getVerticalBox());
+                GuiElementBox guiElementBox = new GuiElementBox(animal);
+                guiElementBox.setSize(width, height);
+                verticalBox = guiElementBox.getVerticalBox();
             } catch (FileNotFoundException ex) {
                 System.out.println(ex);
             }
+            verticalBox.setStyle("-fx-background-color: #f8c9c9");
+            verticalBox.setPrefSize(300/width, 300/height);
             this.grid.add(verticalBox, animal.getPosition().x + 1, height - animal.getPosition().y);
             GridPane.setHalignment(verticalBox, HPos.CENTER);
         }
@@ -123,10 +144,14 @@ public class EngineGui implements ITurnEndObserver, IMagicObserver {
             if(!(animals.containsKey(entry.getKey()))) {
                 VBox verticalBox = null;
                 try {
-                    verticalBox = (new GuiElementBox(entry.getValue()).getVerticalBox());
+                    GuiElementBox guiElementBox = new GuiElementBox(entry.getValue());
+                    guiElementBox.setSize(width, height);
+                    verticalBox = guiElementBox.getVerticalBox();
                 } catch (FileNotFoundException ex) {
                     System.out.println(ex);
                 }
+                verticalBox.setStyle("-fx-background-color: #e1f8c9");
+                verticalBox.setPrefSize(300/width, 300/height);
                 this.grid.add(verticalBox, entry.getValue().getPosition().x + 1, height - entry.getValue().getPosition().y);
                 GridPane.setHalignment(verticalBox, HPos.CENTER);
             }
