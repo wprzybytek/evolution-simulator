@@ -32,12 +32,12 @@ public class StartMenu {
     public StartMenu() {
         this.height = new MenuElementBox("Height", "10");
         this.width = new MenuElementBox("Width", "10");
-        this.startEnergy = new MenuElementBox("Start Energy", "20");
+        this.startEnergy = new MenuElementBox("Start Energy", "40");
         this.moveEnergy = new MenuElementBox("Move Energy", "1");
-        this.plantEnergy = new MenuElementBox("Plant Energy", "10");
+        this.plantEnergy = new MenuElementBox("Plant Energy", "20");
         this.jungleRatio = new MenuElementBox("Jungle Ratio", "0.2");
         this.numberOfAnimals = new MenuElementBox("Number of animals", "30");
-        this.eraTime = new MenuElementBox("Time of an era [ms]: ", "1000");
+        this.eraTime = new MenuElementBox("Time of an era [ms]: ", "500");
         Label flatMap = new Label("Evolution type on flat map: ");
         ToggleGroup flatEvolution = new ToggleGroup();
         this.flatNormal = new RadioButton("Normal Evolution");
